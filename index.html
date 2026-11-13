@@ -6,24 +6,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#123b63">
 <title>R R A M Billing</title>
+
 <style>
+* { box-sizing: border-box; }
+
 body {
   font-family: Arial, sans-serif;
   background: #f1f4c8;
   margin: 0;
   color: #172524;
 }
+
 header {
   background: #123b63;
   color: orange;
   padding: 20px;
   text-align: center;
 }
+
 main {
   max-width: 700px;
   margin: 20px auto;
   padding: 12px;
 }
+
 .card {
   background: gray;
   padding: 18px;
@@ -31,51 +37,124 @@ main {
   margin-bottom: 22px;
   box-shadow: 0 2px 10px #0016;
 }
+
 h2 { font-size: 19px; }
+
 label {
   display: block;
   margin-top: 12px;
   font-weight: bold;
 }
+
 input {
   width: 100%;
   padding: 12px;
   margin-top: 5px;
-  box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 15px;
   font-size: 16px;
 }
+
 button {
   padding: 12px 16px;
-  margin-top: 12px;
+  margin: 6px 3px;
   border: 0;
   border-radius: 7px;
   background: #1769aa;
   color: white;
   font-size: 15px;
+  cursor: pointer;
 }
-.secondary { background: #e5edf5; color: #123b63; }
+
+.secondary {
+  background: #e5edf5;
+  color: #123b63;
+}
+
 .bill {
-  border: 6px solid #ddd;
+  border: 4px solid #ddd;
   padding: 12px;
   border-radius: 8px;
   margin-top: 12px;
   overflow-wrap: anywhere;
 }
+
 .total {
   font-size: 21px;
   font-weight: bold;
   color: #123b63;
+}
+
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loginCard {
+  background: white;
+  width: 100%;
+  max-width: 380px;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #0003;
+  text-align: center;
+}
+
+.loginCard h1 { color: #123b63; }
+
+.loginCard button {
+  width: 100%;
+  background: #123b63;
+}
+
+#loginError { color: red; }
+
+#app { display: none; }
+
+.logoutBtn { background: #a52b2b; }
+
+#locationStatus {
+  overflow-wrap: anywhere;
 }
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="loginCard">
+    <h1>R R A M</h1>
+    <h2>Admin Login</h2>
+
+    <form id="loginForm">
+      <label>Username</label>
+      <input id="loginUsername"
+        placeholder="Enter username"
+        autocomplete="username" required>
+
+      <label>Password</label>
+      <input id="loginPassword"
+        type="password"
+        placeholder="Enter password"
+        autocomplete="current-password" required>
+
+      <button type="submit">LOGIN</button>
+      <p id="loginError"></p>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+
 <header>
-<h1>R R A M @ Bill Book</h1>
-<p>Customer & Field Billing Management</p>
+  <h1>R R A M @ Bill Book</h1>
+  <p>Customer & Field Billing Management</p>
+  <button class="logoutBtn" onclick="logoutUser()">LOGOUT</button>
 </header>
 
 <main>
@@ -101,20 +180,20 @@ button {
 <input id="unit" placeholder="Acre / Hour / Other">
 
 <label>Quantity</label>
-<input id="qty" type="number" min="0" value="1">
+<input id="qty" type="number" min="0" step="any" value="1">
 
 <label>Rate (₹)</label>
-<input id="rate" type="number" min="0" value="0">
+<input id="rate" type="number" min="0" step="any" value="0">
 
 <label>Advance (₹)</label>
-<input id="advance" type="number" min="0" value="0">
+<input id="advance" type="number" min="0" step="any" value="0">
 
 <label>Current Location</label>
 <button type="button" id="locationBtn">
 Get Current Location
 </button>
-<p id="locationStatus">Location not selected</p>
 
+<p id="locationStatus">Location not selected</p>
 <input type="hidden" id="location">
 
 <p>Total Amount:</p>
@@ -122,7 +201,7 @@ Get Current Location
 
 <p id="balance">Balance: ₹0.00</p>
 
-<button type="submit">SAVE BILL</button>
+<button type="submit" id="saveBtn">SAVE BILL</button>
 <button type="reset" class="secondary">CLEAR</button>
 
 </form>
@@ -130,69 +209,148 @@ Get Current Location
 
 <div class="card">
 <h2>Saved Bills</h2>
+
 <button id="exportBtn" class="secondary">
 Export CSV
 </button>
+
 <div id="billList">No bills yet.</div>
 </div>
 
 </main>
+</div>
 
 <script>
 
-const $ = id => document.getElementById(id);
+// LOGIN DETAILS
+const USERNAME = "admin";
+const PASSWORD = "password";
+
+// STORAGE
 const KEY = "rram_billing_bills_v1";
 
-let bills = JSON.parse(localStorage.getItem(KEY) || "[]");
+const $ = id => document.getElementById(id);
+
+let bills = [];
+
+try {
+  bills = JSON.parse(localStorage.getItem(KEY) || "[]");
+  if (!Array.isArray(bills)) bills = [];
+} catch(e) {
+  bills = [];
+}
+
 let editingBillId = null;
 
+// LOGIN
+$("loginForm").onsubmit = function(e) {
+  e.preventDefault();
+
+  const user = $("loginUsername").value.trim();
+  const pass = $("loginPassword").value;
+
+  if (user === USERNAME && pass === PASSWORD) {
+    sessionStorage.setItem("rram_logged_in", "yes");
+    showApp();
+  } else {
+    $("loginError").textContent =
+      "Wrong Username or Password";
+  }
+};
+
+function showApp() {
+  $("loginScreen").style.display = "none";
+  $("app").style.display = "block";
+  calculate();
+  displayBills();
+}
+
+function logoutUser() {
+  sessionStorage.removeItem("rram_logged_in");
+
+  $("app").style.display = "none";
+  $("loginScreen").style.display = "flex";
+  $("loginPassword").value = "";
+  $("loginError").textContent = "";
+}
+
+// AUTO LOGIN FOR CURRENT TAB SESSION
+if (sessionStorage.getItem("rram_logged_in") === "yes") {
+  showApp();
+}
+
+// MONEY
 function money(n) {
   return "₹" + Number(n || 0).toFixed(2);
 }
 
+// CALCULATION
 function calculate() {
   let qty = Number($("qty").value) || 0;
   let rate = Number($("rate").value) || 0;
   let advance = Number($("advance").value) || 0;
+
   let total = qty * rate;
 
   $("total").textContent = money(total);
-  $("balance").textContent = "Balance: " + money(total - advance);
+  $("balance").textContent =
+    "Balance: " + money(total - advance);
 }
 
 ["qty", "rate", "advance"].forEach(id => {
   $(id).addEventListener("input", calculate);
 });
 
-// LOCATION
+// GPS LOCATION
 $("locationBtn").onclick = function() {
+
   if (!navigator.geolocation) {
-    $("locationStatus").textContent = "GPS not supported";
+    $("locationStatus").textContent =
+      "GPS not supported";
     return;
   }
 
-  $("locationStatus").textContent = "Getting location...";
+  $("locationStatus").textContent =
+    "Getting location...";
 
   navigator.geolocation.getCurrentPosition(
     position => {
+
       let lat = position.coords.latitude;
       let lng = position.coords.longitude;
+
       $("location").value = lat + "," + lng;
-      $("locationStatus").textContent = "Location captured";
+
+      $("locationStatus").textContent =
+        "Location captured: " + lat + ", " + lng;
     },
-    () => {
-      $("locationStatus").textContent = "Location unavailable";
+
+    error => {
+      $("locationStatus").textContent =
+        "Location unavailable. Allow GPS permission.";
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 20000,
+      maximumAge: 0
     }
   );
 };
 
+// SAVE DATA
 function saveData() {
-  localStorage.setItem(KEY, JSON.stringify(bills));
-  displayBills();
+  try {
+    localStorage.setItem(KEY, JSON.stringify(bills));
+    displayBills();
+  } catch(e) {
+    alert("Storage error. Please check device storage.");
+  }
 }
 
-// DISPLAY SAVED BILLS
+// DISPLAY BILLS
 function displayBills() {
+
   let box = $("billList");
   box.innerHTML = "";
 
@@ -202,6 +360,7 @@ function displayBills() {
   }
 
   [...bills].reverse().forEach(b => {
+
     let div = document.createElement("div");
     div.className = "bill";
 
@@ -210,67 +369,84 @@ function displayBills() {
     div.appendChild(title);
 
     let details = document.createElement("p");
+
     details.textContent =
       "Phone: " + b.phone +
       " | Village: " + b.village +
-      " | Work: " + b.work;
+      " | Work: " + b.work +
+      " | Unit: " + b.unit;
+
     div.appendChild(details);
 
     let amount = document.createElement("p");
+
     amount.textContent =
-      "Advance: " + money(b.advance) +
+      "Quantity: " + b.qty +
+      " | Rate: " + money(b.rate) +
+      " | Total: " + money(b.total) +
+      " | Advance: " + money(b.advance) +
       " | Balance: " + money(b.balance);
+
     div.appendChild(amount);
 
-    // WHATSAPP BUTTON
-let wa = document.createElement("button");
-wa.textContent = "🟢 SEND WHATSAPP";
-wa.style.background = "#128C7E";
+    // WHATSAPP
+    let wa = document.createElement("button");
 
-wa.onclick = function() {
-  let phone = (b.phone || "").replace(/\D/g, "");
+    wa.textContent = "🟢 SEND WHATSAPP";
+    wa.style.background = "#128C7E";
 
-  if (phone.length === 10) {
-    phone = "91" + phone;
-  }
+    wa.onclick = function() {
 
-  if (phone.length !== 12 || !phone.startsWith("91")) {
-    alert("Enter valid Indian mobile number");
-    return;
-  }
+      let phone = (b.phone || "").replace(/\D/g, "");
 
-  let message =
-    "R R A M BILL BOOK\n\n" +
-    "Customer: " + b.name + "\n" +
-    "Village: " + b.village + "\n" +
-    "Work: " + b.work + "\n" +
-    "Quantity: " + b.qty + "\n" +
-    "Rate: " + money(b.rate) + "\n" +
-    "Total: " + money(b.total) + "\n" +
-    "Advance: " + money(b.advance) + "\n" +
-    "Balance: " + money(b.balance) + "\n\n" +
-    "Thank You!";
+      if (phone.length === 10) {
+        phone = "91" + phone;
+      }
 
-  window.open(
-    "https://wa.me/" + phone + "?text=" +
-    encodeURIComponent(message),
-    "_blank"
-  );
-};
+      if (phone.length !== 12 || !phone.startsWith("91")) {
+        alert("Enter valid Indian mobile number");
+        return;
+      }
 
-div.appendChild(wa);
+      let message =
+        "R R A M BILL BOOK\n\n" +
+        "Customer: " + b.name + "\n" +
+        "Phone: " + b.phone + "\n" +
+        "Village: " + b.village + "\n" +
+        "Work: " + b.work + "\n" +
+        "Unit: " + b.unit + "\n" +
+        "Quantity: " + b.qty + "\n" +
+        "Rate: " + money(b.rate) + "\n" +
+        "Total: " + money(b.total) + "\n" +
+        "Advance: " + money(b.advance) + "\n" +
+        "Balance: " + money(b.balance) + "\n\n" +
+        "Thank You!";
 
+      window.open(
+        "https://wa.me/" + phone +
+        "?text=" + encodeURIComponent(message),
+        "_blank"
+      );
+    };
+
+    div.appendChild(wa);
+
+    // LOCATION
     let location = document.createElement("p");
+
     location.textContent =
       "Location: " + (b.location || "Not captured");
+
     div.appendChild(location);
 
-    // EDIT BUTTON
+    // EDIT
     let edit = document.createElement("button");
+
     edit.textContent = "✏️ EDIT";
     edit.style.background = "#00804a";
 
     edit.onclick = function() {
+
       editingBillId = b.id;
 
       $("name").value = b.name || "";
@@ -284,40 +460,51 @@ div.appendChild(wa);
       $("location").value = b.location || "";
 
       $("locationStatus").textContent =
-        b.location ? "Saved location: " + b.location : "Location not selected";
+        b.location ? "Saved location: " + b.location :
+        "Location not selected";
 
-      $("billForm").querySelector('[type="submit"]').textContent = "UPDATE BILL";
+      $("saveBtn").textContent = "UPDATE BILL";
 
       calculate();
-      $("billForm").scrollIntoView({ behavior: "smooth" });
+
+      $("billForm").scrollIntoView({
+        behavior: "smooth"
+      });
     };
 
     div.appendChild(edit);
 
-    // DELETE BUTTON
+    // DELETE
     let del = document.createElement("button");
+
     del.textContent = "DELETE";
     del.style.background = "#a52b2b";
 
     del.onclick = function() {
+
       if (confirm("Delete this bill?")) {
+
         bills = bills.filter(x => x.id !== b.id);
+
         saveData();
       }
     };
 
     div.appendChild(del);
+
     box.appendChild(div);
   });
 }
 
-// SAVE AND UPDATE
+// SAVE / UPDATE
 $("billForm").onsubmit = function(e) {
+
   e.preventDefault();
 
   let qty = Number($("qty").value) || 0;
   let rate = Number($("rate").value) || 0;
   let advance = Number($("advance").value) || 0;
+
   let total = qty * rate;
 
   if (advance > total) {
@@ -326,25 +513,36 @@ $("billForm").onsubmit = function(e) {
   }
 
   let bill = {
-    id: editingBillId !== null ? editingBillId : Date.now(),
+
+    id: editingBillId !== null ?
+      editingBillId : Date.now(),
+
     name: $("name").value.trim(),
     phone: $("phone").value.trim(),
     village: $("village").value.trim(),
     work: $("work").value.trim(),
     unit: $("unit").value.trim(),
+
     qty,
     rate,
     total,
     advance,
+
     balance: total - advance,
+
     location: $("location").value,
-    createdAt: editingBillId !== null
-      ? (bills.find(b => b.id === editingBillId)?.createdAt || new Date().toISOString())
-      : new Date().toISOString()
+
+    createdAt: editingBillId !== null ?
+      (bills.find(b => b.id === editingBillId)?.createdAt ||
+      new Date().toISOString()) :
+      new Date().toISOString()
   };
 
   if (editingBillId !== null) {
-    let index = bills.findIndex(b => b.id === editingBillId);
+
+    let index = bills.findIndex(
+      b => b.id === editingBillId
+    );
 
     if (index === -1) {
       alert("Bill not found");
@@ -352,13 +550,18 @@ $("billForm").onsubmit = function(e) {
     }
 
     bills[index] = bill;
+
     alert("Bill Updated Successfully!");
+
   } else {
+
     bills.push(bill);
+
     alert("Bill Saved Successfully!");
   }
 
   editingBillId = null;
+
   saveData();
 
   this.reset();
@@ -367,58 +570,81 @@ $("billForm").onsubmit = function(e) {
   $("rate").value = 0;
   $("advance").value = 0;
   $("location").value = "";
-  $("locationStatus").textContent = "Location not selected";
-  $("billForm").querySelector('[type="submit"]').textContent = "SAVE BILL";
+
+  $("locationStatus").textContent =
+    "Location not selected";
+
+  $("saveBtn").textContent = "SAVE BILL";
 
   calculate();
 };
 
 // CLEAR / CANCEL EDIT
 $("billForm").addEventListener("reset", function() {
+
   editingBillId = null;
-  $("billForm").querySelector('[type="submit"]').textContent = "SAVE BILL";
+
+  $("saveBtn").textContent = "SAVE BILL";
+
 });
 
 // EXPORT CSV
 $("exportBtn").onclick = function() {
+
   if (!bills.length) {
     alert("No bills to export");
     return;
   }
 
   let columns = [
-    "name", "phone", "village", "work",
-    "unit", "qty", "rate", "total",
-    "advance", "balance", "location", "createdAt"
+    "name",
+    "phone",
+    "village",
+    "work",
+    "unit",
+    "qty",
+    "rate",
+    "total",
+    "advance",
+    "balance",
+    "location",
+    "createdAt"
   ];
 
   let csv = [
     columns.join(","),
+
     ...bills.map(b =>
       columns.map(k =>
         '"' + String(b[k] ?? "").replace(/"/g, '""') + '"'
       ).join(",")
     )
+
   ].join("\n");
 
-  let blob = new Blob(["\ufeff" + csv], {
-    type: "text/csv;charset=utf-8"
-  });
+  let blob = new Blob(
+    ["\ufeff" + csv],
+    { type: "text/csv;charset=utf-8" }
+  );
 
   let url = URL.createObjectURL(blob);
+
   let a = document.createElement("a");
+
   a.href = url;
   a.download = "RRAM-Bills.csv";
+
+  document.body.appendChild(a);
   a.click();
+  a.remove();
+
   URL.revokeObjectURL(url);
 };
 
+// INITIAL CALCULATION
 calculate();
-displayBills();
 
 </script>
+
 </body>
 </html>
-
-
-
