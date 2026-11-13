@@ -8,153 +8,83 @@
 <title>R R A M Billing</title>
 
 <style>
-* { box-sizing: border-box; }
-
-body {
-  font-family: Arial, sans-serif;
-  background: #f1f4c8;
-  margin: 0;
-  color: #172524;
-}
-
-header {
-  background: #123b63;
-  color: orange;
-  padding: 20px;
-  text-align: center;
-}
-
-main {
-  max-width: 700px;
-  margin: 20px auto;
-  padding: 12px;
-}
-
-.card {
-  background: gray;
-  padding: 18px;
-  border-radius: 16px;
-  margin-bottom: 22px;
-  box-shadow: 0 2px 10px #0016;
-}
-
-h2 { font-size: 19px; }
-
-label {
-  display: block;
-  margin-top: 12px;
-  font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  font-size: 16px;
-}
-
-button {
-  padding: 12px 16px;
-  margin: 6px 3px;
-  border: 0;
-  border-radius: 7px;
-  background: #1769aa;
-  color: white;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.secondary {
-  background: #e5edf5;
-  color: #123b63;
-}
-
-.bill {
-  border: 4px solid #ddd;
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 12px;
-  overflow-wrap: anywhere;
-}
-
-.total {
-  font-size: 21px;
-  font-weight: bold;
-  color: #123b63;
-}
-
-#loginScreen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.loginCard {
-  background: white;
-  width: 100%;
-  max-width: 380px;
-  padding: 25px;
-  border-radius: 18px;
-  box-shadow: 0 4px 18px #0003;
-  text-align: center;
-}
-
-.loginCard h1 { color: #123b63; }
-
-.loginCard button {
-  width: 100%;
-  background: #123b63;
-}
-
-#loginError { color: red; }
-
-#app { display: none; }
-
-.logoutBtn { background: #a52b2b; }
-
-#locationStatus {
-  overflow-wrap: anywhere;
-}
+*{box-sizing:border-box}
+body{font-family:Arial;background:#f1f4c8;margin:0;color:#172524}
+header{background:#123b63;color:orange;padding:20px;text-align:center}
+main{max-width:700px;margin:20px auto;padding:12px}
+.card{background:gray;padding:18px;border-radius:16px;margin-bottom:22px;box-shadow:0 2px 10px #0016}
+h2{font-size:19px}
+label{display:block;margin-top:12px;font-weight:bold}
+input{width:100%;padding:12px;margin-top:5px;border:1px solid #ccc;border-radius:15px;font-size:16px}
+button{padding:12px 16px;margin:6px 3px;border:0;border-radius:7px;background:#1769aa;color:white;font-size:15px;cursor:pointer}
+.secondary{background:#e5edf5;color:#123b63}
+.bill{border:4px solid #ddd;padding:12px;border-radius:8px;margin-top:12px;overflow-wrap:anywhere;background:#eee}
+.total{font-size:21px;font-weight:bold;color:#123b63}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.loginCard{background:white;width:100%;max-width:380px;padding:25px;border-radius:18px;box-shadow:0 4px 18px #0003;text-align:center}
+.loginCard h1{color:#123b63}
+.loginCard button{width:100%;background:#123b63}
+#loginError{color:red}
+#app{display:none}
+.logoutBtn{background:#a52b2b}
+#locationStatus{overflow-wrap:anywhere}
+.authLink{color:#1769aa;cursor:pointer;text-decoration:underline}
+#authMessage{overflow-wrap:anywhere}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
+<!-- AUTH SCREEN -->
 <div id="loginScreen">
-  <div class="loginCard">
-    <h1>R R A M</h1>
-    <h2>Admin Login</h2>
+ <div class="loginCard">
+  <h1>R R A M</h1>
+  <h2 id="authTitle">Email Login</h2>
 
-    <form id="loginForm">
-      <label>Username</label>
-      <input id="loginUsername"
-        placeholder="Enter username"
-        autocomplete="username" required>
+  <form id="authForm">
+   <div id="nameField" style="display:none">
+    <label>Your Name</label>
+    <input id="signupName" placeholder="Enter your name">
+   </div>
 
-      <label>Password</label>
-      <input id="loginPassword"
-        type="password"
-        placeholder="Enter password"
-        autocomplete="current-password" required>
+   <label>Email Address</label>
+   <input id="email" type="email" placeholder="Enter email" required>
 
-      <button type="submit">LOGIN</button>
-      <p id="loginError"></p>
-    </form>
-  </div>
+   <label>Password</label>
+   <input id="password" type="password" placeholder="Enter password" minlength="6" required>
+
+   <div id="confirmField" style="display:none">
+    <label>Confirm Password</label>
+    <input id="confirmPassword" type="password" placeholder="Confirm password">
+   </div>
+
+   <button type="submit" id="authButton">LOGIN</button>
+  </form>
+
+  <p id="authMessage"></p>
+
+  <p id="signupText">
+   New user? <span class="authLink" id="showSignup">Sign Up</span>
+  </p>
+
+  <p id="loginText" style="display:none">
+   Already registered? <span class="authLink" id="showLogin">Login</span>
+  </p>
+
+  <p>
+   <span class="authLink" id="forgotPassword">Forgot Password?</span>
+  </p>
+ </div>
 </div>
 
 <!-- MAIN APP -->
 <div id="app">
 
 <header>
-  <h1>R R A M @ Bill Book</h1>
-  <p>Customer & Field Billing Management</p>
-  <button class="logoutBtn" onclick="logoutUser()">LOGOUT</button>
+ <h1>R R A M @ Bill Book</h1>
+ <p>Customer & Field Billing Management</p>
+ <p id="userEmail"></p>
+ <button class="logoutBtn" id="logoutBtn">LOGOUT</button>
 </header>
 
 <main>
@@ -189,16 +119,12 @@ button {
 <input id="advance" type="number" min="0" step="any" value="0">
 
 <label>Current Location</label>
-<button type="button" id="locationBtn">
-Get Current Location
-</button>
-
+<button type="button" id="locationBtn">Get Current Location</button>
 <p id="locationStatus">Location not selected</p>
 <input type="hidden" id="location">
 
 <p>Total Amount:</p>
 <div class="total" id="total">₹0.00</div>
-
 <p id="balance">Balance: ₹0.00</p>
 
 <button type="submit" id="saveBtn">SAVE BILL</button>
@@ -209,361 +135,562 @@ Get Current Location
 
 <div class="card">
 <h2>Saved Bills</h2>
-
-<button id="exportBtn" class="secondary">
-Export CSV
-</button>
-
-<div id="billList">No bills yet.</div>
+<button id="exportBtn" class="secondary">Export CSV</button>
+<div id="billList">Loading bills...</div>
 </div>
 
 </main>
 </div>
 
-<script>
+<script type="module">
 
-// LOGIN DETAILS
-const USERNAME = "admin";
-const PASSWORD = "password";
+// =================================
+// FIREBASE CONFIGURATION
+// =================================
 
-// STORAGE
-const KEY = "rram_billing_bills_v1";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+
+import {
+ getAuth,
+ createUserWithEmailAndPassword,
+ signInWithEmailAndPassword,
+ sendEmailVerification,
+ sendPasswordResetEmail,
+ signOut,
+ onAuthStateChanged,
+ updateProfile
+}
+from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+import {
+ getFirestore,
+ collection,
+ addDoc,
+ updateDoc,
+ deleteDoc,
+ doc,
+ onSnapshot,
+ query,
+ orderBy
+}
+from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+// IMPORTANT: Replace these values with your Firebase project config.
+
+const firebaseConfig = {
+ apiKey: "YOUR_API_KEY",
+ authDomain: "YOUR_PROJECT.firebaseapp.com",
+ projectId: "YOUR_PROJECT_ID",
+ storageBucket: "YOUR_PROJECT.firebasestorage.app",
+ messagingSenderId: "YOUR_SENDER_ID",
+ appId: "YOUR_APP_ID"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
+// =================================
+// VARIABLES
+// =================================
 
 const $ = id => document.getElementById(id);
 
+let currentUser = null;
 let bills = [];
+let editingBillId = null;
+let unsubscribeBills = null;
+let authMode = "login";
 
-try {
-  bills = JSON.parse(localStorage.getItem(KEY) || "[]");
-  if (!Array.isArray(bills)) bills = [];
-} catch(e) {
-  bills = [];
+const billsCollection = () =>
+ collection(db, "users", currentUser.uid, "bills");
+
+// =================================
+// AUTH MODE
+// =================================
+
+function setAuthMode(mode) {
+ authMode = mode;
+
+ $("authMessage").textContent = "";
+ $("authTitle").textContent =
+  mode === "signup" ? "Create New Account" : "Email Login";
+
+ $("authButton").textContent =
+  mode === "signup" ? "SIGN UP" : "LOGIN";
+
+ $("nameField").style.display =
+  mode === "signup" ? "block" : "none";
+
+ $("confirmField").style.display =
+  mode === "signup" ? "block" : "none";
+
+ $("signupText").style.display =
+  mode === "login" ? "block" : "none";
+
+ $("loginText").style.display =
+  mode === "signup" ? "block" : "none";
 }
 
-let editingBillId = null;
+$("showSignup").onclick = () => setAuthMode("signup");
+$("showLogin").onclick = () => setAuthMode("login");
 
-// LOGIN
-$("loginForm").onsubmit = function(e) {
-  e.preventDefault();
+// =================================
+// SIGN UP AND LOGIN
+// =================================
 
-  const user = $("loginUsername").value.trim();
-  const pass = $("loginPassword").value;
+$("authForm").onsubmit = async e => {
+ e.preventDefault();
 
-  if (user === USERNAME && pass === PASSWORD) {
-    sessionStorage.setItem("rram_logged_in", "yes");
-    showApp();
+ const email = $("email").value.trim();
+ const password = $("password").value;
+
+ $("authButton").disabled = true;
+ $("authMessage").textContent = "Please wait...";
+
+ try {
+
+  if (authMode === "signup") {
+
+   const name = $("signupName").value.trim();
+   const confirm = $("confirmPassword").value;
+
+   if (!name) throw new Error("Enter your name");
+
+   if (password !== confirm)
+    throw new Error("Passwords do not match");
+
+   const credential =
+    await createUserWithEmailAndPassword(auth,email,password);
+
+   await updateProfile(credential.user,{displayName:name});
+
+   try {
+    await sendEmailVerification(credential.user);
+    $("authMessage").textContent =
+     "Account created! Verification email sent.";
+   } catch(error) {
+    console.error(error);
+   }
+
   } else {
-    $("loginError").textContent =
-      "Wrong Username or Password";
+
+   await signInWithEmailAndPassword(auth,email,password);
   }
+
+ } catch(error) {
+
+  $("authMessage").textContent =
+   error.code === "auth/email-already-in-use"
+   ? "This email is already registered."
+   : error.code === "auth/invalid-credential"
+   ? "Incorrect email or password."
+   : error.code === "auth/weak-password"
+   ? "Password must contain at least 6 characters."
+   : error.message;
+
+ } finally {
+  $("authButton").disabled = false;
+ }
 };
 
-function showApp() {
-  $("loginScreen").style.display = "none";
-  $("app").style.display = "block";
-  calculate();
-  displayBills();
-}
+// =================================
+// FORGOT PASSWORD
+// =================================
 
-function logoutUser() {
-  sessionStorage.removeItem("rram_logged_in");
+$("forgotPassword").onclick = async () => {
 
+ const email = $("email").value.trim();
+
+ if (!email) {
+  alert("Please enter your email address first.");
+  return;
+ }
+
+ try {
+  await sendPasswordResetEmail(auth,email);
+  alert("Password reset link sent to your email.");
+ } catch(error) {
+  alert(error.message);
+ }
+};
+
+// =================================
+// AUTH STATE
+// =================================
+
+onAuthStateChanged(auth,user => {
+
+ if (unsubscribeBills) {
+  unsubscribeBills();
+  unsubscribeBills = null;
+ }
+
+ if (user) {
+  currentUser = user;
+  showApp();
+ } else {
+  currentUser = null;
+  bills = [];
   $("app").style.display = "none";
   $("loginScreen").style.display = "flex";
-  $("loginPassword").value = "";
-  $("loginError").textContent = "";
-}
-
-// AUTO LOGIN FOR CURRENT TAB SESSION
-if (sessionStorage.getItem("rram_logged_in") === "yes") {
-  showApp();
-}
-
-// MONEY
-function money(n) {
-  return "₹" + Number(n || 0).toFixed(2);
-}
-
-// CALCULATION
-function calculate() {
-  let qty = Number($("qty").value) || 0;
-  let rate = Number($("rate").value) || 0;
-  let advance = Number($("advance").value) || 0;
-
-  let total = qty * rate;
-
-  $("total").textContent = money(total);
-  $("balance").textContent =
-    "Balance: " + money(total - advance);
-}
-
-["qty", "rate", "advance"].forEach(id => {
-  $(id).addEventListener("input", calculate);
+  setAuthMode("login");
+ }
 });
 
-// GPS LOCATION
-$("locationBtn").onclick = function() {
+// =================================
+// SHOW APP
+// =================================
 
-  if (!navigator.geolocation) {
-    $("locationStatus").textContent =
-      "GPS not supported";
-    return;
-  }
+function showApp() {
 
-  $("locationStatus").textContent =
-    "Getting location...";
+ $("loginScreen").style.display = "none";
+ $("app").style.display = "block";
 
-  navigator.geolocation.getCurrentPosition(
-    position => {
+ $("userEmail").textContent =
+  "Logged in: " + currentUser.email;
 
-      let lat = position.coords.latitude;
-      let lng = position.coords.longitude;
+ calculate();
+ loadBills();
+}
 
-      $("location").value = lat + "," + lng;
+$("logoutBtn").onclick = async () => {
 
-      $("locationStatus").textContent =
-        "Location captured: " + lat + ", " + lng;
-    },
-
-    error => {
-      $("locationStatus").textContent =
-        "Location unavailable. Allow GPS permission.";
-    },
-
-    {
-      enableHighAccuracy: true,
-      timeout: 20000,
-      maximumAge: 0
-    }
-  );
+ if (confirm("Are you sure you want to logout?")) {
+  await signOut(auth);
+ }
 };
 
-// SAVE DATA
-function saveData() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(bills));
-    displayBills();
-  } catch(e) {
-    alert("Storage error. Please check device storage.");
-  }
+// =================================
+// MONEY
+// =================================
+
+function money(n) {
+ return "₹" + Number(n || 0).toFixed(2);
 }
 
+// =================================
+// CALCULATION
+// =================================
+
+function calculate() {
+
+ let qty = Number($("qty").value) || 0;
+ let rate = Number($("rate").value) || 0;
+ let advance = Number($("advance").value) || 0;
+
+ let total = qty * rate;
+
+ $("total").textContent = money(total);
+ $("balance").textContent =
+  "Balance: " + money(total - advance);
+}
+
+["qty","rate","advance"].forEach(id => {
+ $(id).addEventListener("input",calculate);
+});
+
+// =================================
+// GPS LOCATION
+// =================================
+
+$("locationBtn").onclick = () => {
+
+ if (!navigator.geolocation) {
+  $("locationStatus").textContent = "GPS not supported";
+  return;
+ }
+
+ $("locationStatus").textContent = "Getting location...";
+
+ navigator.geolocation.getCurrentPosition(
+
+  position => {
+
+   const lat = position.coords.latitude;
+   const lng = position.coords.longitude;
+
+   $("location").value = lat + "," + lng;
+
+   $("locationStatus").textContent =
+    "Location captured: " + lat + ", " + lng;
+  },
+
+  error => {
+   $("locationStatus").textContent =
+    "Location unavailable. Allow GPS permission.";
+  },
+
+  {
+   enableHighAccuracy:true,
+   timeout:20000,
+   maximumAge:0
+  }
+ );
+};
+
+// =================================
+// LOAD USER BILLS FROM FIRESTORE
+// =================================
+
+function loadBills() {
+
+ $("billList").textContent = "Loading bills...";
+
+ const q = query(
+  billsCollection(),
+  orderBy("createdAt","desc")
+ );
+
+ unsubscribeBills = onSnapshot(q,
+
+  snapshot => {
+
+   bills = snapshot.docs.map(d => ({
+    id:d.id,
+    ...d.data()
+   }));
+
+   displayBills();
+  },
+
+  error => {
+   $("billList").textContent =
+    "Unable to load bills: " + error.message;
+  }
+ );
+}
+
+// =================================
+// SAVE DATA TO CLOUD
+// =================================
+
+async function saveBillData(bill) {
+
+ if (editingBillId) {
+
+  await updateDoc(
+   doc(db,"users",currentUser.uid,"bills",editingBillId),
+   bill
+  );
+
+ } else {
+
+  await addDoc(billsCollection(),bill);
+ }
+}
+
+// =================================
 // DISPLAY BILLS
+// =================================
+
 function displayBills() {
 
-  let box = $("billList");
-  box.innerHTML = "";
+ const box = $("billList");
+ box.innerHTML = "";
 
-  if (!bills.length) {
-    box.textContent = "No bills yet.";
+ if (!bills.length) {
+  box.textContent = "No bills yet.";
+  return;
+ }
+
+ bills.forEach(b => {
+
+  const div = document.createElement("div");
+  div.className = "bill";
+
+  const title = document.createElement("h3");
+  title.textContent = b.name + " - " + money(b.total);
+  div.appendChild(title);
+
+  const details = document.createElement("p");
+  details.textContent =
+   "Phone: " + b.phone +
+   " | Village: " + b.village +
+   " | Work: " + b.work +
+   " | Unit: " + b.unit;
+  div.appendChild(details);
+
+  const amount = document.createElement("p");
+  amount.textContent =
+   "Quantity: " + b.qty +
+   " | Rate: " + money(b.rate) +
+   " | Total: " + money(b.total) +
+   " | Advance: " + money(b.advance) +
+   " | Balance: " + money(b.balance);
+  div.appendChild(amount);
+
+  // CUSTOMER CALL
+
+  const call = document.createElement("button");
+  call.textContent = "📞 CALL CUSTOMER";
+  call.style.background = "#00804a";
+
+  call.onclick = () => {
+   const phone = (b.phone || "").replace(/\D/g,"");
+   if (phone.length < 10) {
+    alert("Invalid phone number");
     return;
-  }
-
-  [...bills].reverse().forEach(b => {
-
-    let div = document.createElement("div");
-    div.className = "bill";
-
-    let title = document.createElement("h3");
-    title.textContent = b.name + " - " + money(b.total);
-    div.appendChild(title);
-
-    let details = document.createElement("p");
-
-    details.textContent =
-      "Phone: " + b.phone +
-      " | Village: " + b.village +
-      " | Work: " + b.work +
-      " | Unit: " + b.unit;
-
-    div.appendChild(details);
-
-    let amount = document.createElement("p");
-
-    amount.textContent =
-      "Quantity: " + b.qty +
-      " | Rate: " + money(b.rate) +
-      " | Total: " + money(b.total) +
-      " | Advance: " + money(b.advance) +
-      " | Balance: " + money(b.balance);
-
-    div.appendChild(amount);
-
-    // WHATSAPP
-    let wa = document.createElement("button");
-
-    wa.textContent = "🟢 SEND WHATSAPP";
-    wa.style.background = "#128C7E";
-
-    wa.onclick = function() {
-
-      let phone = (b.phone || "").replace(/\D/g, "");
-
-      if (phone.length === 10) {
-        phone = "91" + phone;
-      }
-
-      if (phone.length !== 12 || !phone.startsWith("91")) {
-        alert("Enter valid Indian mobile number");
-        return;
-      }
-
-      let message =
-        "R R A M BILL BOOK\n\n" +
-        "Customer: " + b.name + "\n" +
-        "Phone: " + b.phone + "\n" +
-        "Village: " + b.village + "\n" +
-        "Work: " + b.work + "\n" +
-        "Unit: " + b.unit + "\n" +
-        "Quantity: " + b.qty + "\n" +
-        "Rate: " + money(b.rate) + "\n" +
-        "Total: " + money(b.total) + "\n" +
-        "Advance: " + money(b.advance) + "\n" +
-        "Balance: " + money(b.balance) + "\n\n" +
-        "Thank You!";
-
-      window.open(
-        "https://wa.me/" + phone +
-        "?text=" + encodeURIComponent(message),
-        "_blank"
-      );
-    };
-
-    div.appendChild(wa);
-
-    // LOCATION
-    let location = document.createElement("p");
-
-    location.textContent =
-      "Location: " + (b.location || "Not captured");
-
-    div.appendChild(location);
-
-    // EDIT
-    let edit = document.createElement("button");
-
-    edit.textContent = "✏️ EDIT";
-    edit.style.background = "#00804a";
-
-    edit.onclick = function() {
-
-      editingBillId = b.id;
-
-      $("name").value = b.name || "";
-      $("phone").value = b.phone || "";
-      $("village").value = b.village || "";
-      $("work").value = b.work || "";
-      $("unit").value = b.unit || "";
-      $("qty").value = b.qty ?? 1;
-      $("rate").value = b.rate ?? 0;
-      $("advance").value = b.advance ?? 0;
-      $("location").value = b.location || "";
-
-      $("locationStatus").textContent =
-        b.location ? "Saved location: " + b.location :
-        "Location not selected";
-
-      $("saveBtn").textContent = "UPDATE BILL";
-
-      calculate();
-
-      $("billForm").scrollIntoView({
-        behavior: "smooth"
-      });
-    };
-
-    div.appendChild(edit);
-
-    // DELETE
-    let del = document.createElement("button");
-
-    del.textContent = "DELETE";
-    del.style.background = "#a52b2b";
-
-    del.onclick = function() {
-
-      if (confirm("Delete this bill?")) {
-
-        bills = bills.filter(x => x.id !== b.id);
-
-        saveData();
-      }
-    };
-
-    div.appendChild(del);
-
-    box.appendChild(div);
-  });
-}
-
-// SAVE / UPDATE
-$("billForm").onsubmit = function(e) {
-
-  e.preventDefault();
-
-  let qty = Number($("qty").value) || 0;
-  let rate = Number($("rate").value) || 0;
-  let advance = Number($("advance").value) || 0;
-
-  let total = qty * rate;
-
-  if (advance > total) {
-    alert("Advance cannot exceed total amount");
-    return;
-  }
-
-  let bill = {
-
-    id: editingBillId !== null ?
-      editingBillId : Date.now(),
-
-    name: $("name").value.trim(),
-    phone: $("phone").value.trim(),
-    village: $("village").value.trim(),
-    work: $("work").value.trim(),
-    unit: $("unit").value.trim(),
-
-    qty,
-    rate,
-    total,
-    advance,
-
-    balance: total - advance,
-
-    location: $("location").value,
-
-    createdAt: editingBillId !== null ?
-      (bills.find(b => b.id === editingBillId)?.createdAt ||
-      new Date().toISOString()) :
-      new Date().toISOString()
+   }
+   window.location.href = "tel:" + phone;
   };
 
-  if (editingBillId !== null) {
+  div.appendChild(call);
 
-    let index = bills.findIndex(
-      b => b.id === editingBillId
-    );
+  // WHATSAPP
 
-    if (index === -1) {
-      alert("Bill not found");
-      return;
+  const wa = document.createElement("button");
+  wa.textContent = "🟢 SEND WHATSAPP";
+  wa.style.background = "#128C7E";
+
+  wa.onclick = () => {
+
+   let phone = (b.phone || "").replace(/\D/g,"");
+
+   if (phone.length === 10) phone = "91" + phone;
+
+   if (phone.length !== 12 || !phone.startsWith("91")) {
+    alert("Enter valid Indian mobile number");
+    return;
+   }
+
+   const message =
+    "R R A M BILL BOOK\n\n" +
+    "Customer: " + b.name + "\n" +
+    "Phone: " + b.phone + "\n" +
+    "Village: " + b.village + "\n" +
+    "Work: " + b.work + "\n" +
+    "Unit: " + b.unit + "\n" +
+    "Quantity: " + b.qty + "\n" +
+    "Rate: " + money(b.rate) + "\n" +
+    "Total: " + money(b.total) + "\n" +
+    "Advance: " + money(b.advance) + "\n" +
+    "Balance: " + money(b.balance) + "\n\nThank You!";
+
+   window.open(
+    "https://wa.me/" + phone +
+    "?text=" + encodeURIComponent(message),
+    "_blank"
+   );
+  };
+
+  div.appendChild(wa);
+
+  // LOCATION
+
+  const loc = document.createElement("p");
+  loc.textContent = "Location: " + (b.location || "Not captured");
+  div.appendChild(loc);
+
+  // EDIT
+
+  const edit = document.createElement("button");
+  edit.textContent = "✏️ EDIT";
+  edit.style.background = "#00804a";
+
+  edit.onclick = () => {
+
+   editingBillId = b.id;
+
+   $("name").value = b.name || "";
+   $("phone").value = b.phone || "";
+   $("village").value = b.village || "";
+   $("work").value = b.work || "";
+   $("unit").value = b.unit || "";
+   $("qty").value = b.qty ?? 1;
+   $("rate").value = b.rate ?? 0;
+   $("advance").value = b.advance ?? 0;
+   $("location").value = b.location || "";
+
+   $("locationStatus").textContent =
+    b.location ? "Saved location: " + b.location :
+    "Location not selected";
+
+   $("saveBtn").textContent = "UPDATE BILL";
+   calculate();
+
+   $("billForm").scrollIntoView({behavior:"smooth"});
+  };
+
+  div.appendChild(edit);
+
+  // DELETE
+
+  const del = document.createElement("button");
+  del.textContent = "DELETE";
+  del.style.background = "#a52b2b";
+
+  del.onclick = async () => {
+
+   if (confirm("Delete this bill?")) {
+
+    try {
+     await deleteDoc(
+      doc(db,"users",currentUser.uid,"bills",b.id)
+     );
+    } catch(error) {
+     alert("Delete failed: " + error.message);
     }
+   }
+  };
 
-    bills[index] = bill;
+  div.appendChild(del);
+  box.appendChild(div);
+ });
+}
 
-    alert("Bill Updated Successfully!");
+// =================================
+// SAVE / UPDATE BILL
+// =================================
 
-  } else {
+$("billForm").onsubmit = async function(e) {
 
-    bills.push(bill);
+ e.preventDefault();
 
-    alert("Bill Saved Successfully!");
-  }
+ const qty = Number($("qty").value) || 0;
+ const rate = Number($("rate").value) || 0;
+ const advance = Number($("advance").value) || 0;
+
+ const total = qty * rate;
+
+ if (advance > total) {
+  alert("Advance cannot exceed total amount");
+  return;
+ }
+
+ const oldBill = bills.find(b => b.id === editingBillId);
+
+ const bill = {
+
+  name:$("name").value.trim(),
+  phone:$("phone").value.trim(),
+  village:$("village").value.trim(),
+  work:$("work").value.trim(),
+  unit:$("unit").value.trim(),
+
+  qty,
+  rate,
+  total,
+  advance,
+  balance:total-advance,
+
+  location:$("location").value,
+
+  createdAt:oldBill?.createdAt || new Date().toISOString()
+ };
+
+ $("saveBtn").disabled = true;
+
+ try {
+
+  await saveBillData(bill);
+
+  alert(editingBillId ?
+   "Bill Updated Successfully!" :
+   "Bill Saved Successfully!");
 
   editingBillId = null;
-
-  saveData();
-
   this.reset();
 
   $("qty").value = 1;
@@ -571,80 +698,73 @@ $("billForm").onsubmit = function(e) {
   $("advance").value = 0;
   $("location").value = "";
 
-  $("locationStatus").textContent =
-    "Location not selected";
-
+  $("locationStatus").textContent = "Location not selected";
   $("saveBtn").textContent = "SAVE BILL";
 
   calculate();
+
+ } catch(error) {
+  alert("Save failed: " + error.message);
+ } finally {
+  $("saveBtn").disabled = false;
+ }
 };
 
+// =================================
 // CLEAR / CANCEL EDIT
-$("billForm").addEventListener("reset", function() {
+// =================================
 
-  editingBillId = null;
-
-  $("saveBtn").textContent = "SAVE BILL";
-
+$("billForm").addEventListener("reset",() => {
+ editingBillId = null;
+ $("saveBtn").textContent = "SAVE BILL";
 });
 
+// =================================
 // EXPORT CSV
-$("exportBtn").onclick = function() {
+// =================================
 
-  if (!bills.length) {
-    alert("No bills to export");
-    return;
-  }
+$("exportBtn").onclick = () => {
 
-  let columns = [
-    "name",
-    "phone",
-    "village",
-    "work",
-    "unit",
-    "qty",
-    "rate",
-    "total",
-    "advance",
-    "balance",
-    "location",
-    "createdAt"
-  ];
+ if (!bills.length) {
+  alert("No bills to export");
+  return;
+ }
 
-  let csv = [
-    columns.join(","),
+ const columns = [
+  "name","phone","village","work","unit",
+  "qty","rate","total","advance","balance",
+  "location","createdAt"
+ ];
 
-    ...bills.map(b =>
-      columns.map(k =>
-        '"' + String(b[k] ?? "").replace(/"/g, '""') + '"'
-      ).join(",")
-    )
+ const csv = [
+  columns.join(","),
+  ...bills.map(b =>
+   columns.map(k =>
+    '"' + String(b[k] ?? "").replace(/"/g,'""') + '"'
+   ).join(",")
+  )
+ ].join("\n");
 
-  ].join("\n");
+ const blob = new Blob(
+  ["\ufeff" + csv],
+  {type:"text/csv;charset=utf-8"}
+ );
 
-  let blob = new Blob(
-    ["\ufeff" + csv],
-    { type: "text/csv;charset=utf-8" }
-  );
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement("a");
 
-  let url = URL.createObjectURL(blob);
+ a.href = url;
+ a.download = "RRAM-Bills.csv";
 
-  let a = document.createElement("a");
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
 
-  a.href = url;
-  a.download = "RRAM-Bills.csv";
-
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-
-  URL.revokeObjectURL(url);
+ URL.revokeObjectURL(url);
 };
 
-// INITIAL CALCULATION
 calculate();
 
 </script>
-
 </body>
 </html>
